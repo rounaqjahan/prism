@@ -1,0 +1,17 @@
+{
+  "fields": {
+    "platform": "str",
+    "result": "str",
+    "checks": "list+"
+  },
+  "enums": {
+    "result": [
+      "pass",
+      "fail",
+      "unverified"
+    ]
+  },
+  "checks": [
+    "verdict"
+  ]
+}

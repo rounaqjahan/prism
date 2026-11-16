@@ -1,0 +1,120 @@
+{
+  "name": "iOS",
+  "exts": [
+    ".swift"
+  ],
+  "needs_mac": true,
+  "detect": {
+    "any": [
+      "*.xcodeproj",
+      "*.xcworkspace",
+      "Package.swift"
+    ]
+  },
+  "gate": {
+    "app": [
+      {
+        "cmd": [
+          "xcodebuild",
+          "-scheme",
+          "{scheme}",
+          "-destination",
+          "platform=iOS Simulator,name={sim}",
+          "build"
+        ],
+        "build": true,
+        "os": [
+          "mac"
+        ]
+      }
+    ],
+    "sdk": [
+      {
+        "cmd": [
+          "xcodebuild",
+          "-scheme",
+          "{scheme}",
+          "-destination",
+          "platform=iOS Simulator,name={sim}",
+          "build"
+        ],
+        "build": true,
+        "os": [
+          "mac"
+        ]
+      }
+    ]
+  },
+  "run_needs": [
+    "ios-mcp",
+    "ios-simulator",
+    "xcode-open"
+  ],
+  "standing_rules": [
+    {
+      "rule": "No debug prints left in code",
+      "pattern": "^\\s*(print|debugPrint|dump|NSLog)\\(",
+      "said": "no slop, no unnecessary code"
+    },
+    {
+      "rule": "No TODO/FIXME left in code",
+      "pattern": "\\b(TODO|FIXME)\\b",
+      "said": "no slop, no unnecessary code"
+    },
+    {
+      "rule": "Swift types are UpperCamelCase",
+      "pattern": "\\b(class|struct|enum|protocol|actor)\\s+[a-z_]\\w*\\s*[:{<]",
+      "ext": [
+        ".swift"
+      ],
+      "said": "follow each platform's naming convention"
+    },
+    {
+      "rule": "Swift functions are lowerCamelCase",
+      "pattern": "\\bfunc\\s+[A-Z]",
+      "ext": [
+        ".swift"
+      ],
+      "said": "follow each platform's naming convention"
+    },
+    {
+      "rule": "New Swift files are UpperCamelCase.swift",
+      "name_pattern": "^[A-Z][A-Za-z0-9]*(\\+[A-Z][A-Za-z0-9]*)?\\.swift$",
+      "ext": [
+        ".swift"
+      ],
+      "said": "follow each platform's naming convention"
+    }
+  ],
+  "create_note": "Make the empty app in Xcode (File > New > Project > App, SwiftUI) and save it inside this repo folder. No commit needed; Prism commits the shell.",
+  "mvvm_c": {
+    "description": "MVVM-C: SwiftUI views stay dumb and only bind to a ViewModel (ObservableObject/@Observable); ViewModels hold the logic and talk to repositories; repositories own all networking and storage; Coordinators own navigation and build screens; dependencies are passed in through init.",
+    "folders": {
+      "screens": "Views/<Feature>/",
+      "logic": "ViewModels/<Feature>/",
+      "data": "Data/Repositories/",
+      "navigation": "Coordinators/<Feature>Coordinator.swift"
+    },
+    "max_file_lines": 300,
+    "rules": [
+      {
+        "rule": "No singletons",
+        "pattern": "static\\s+(let|var)\\s+shared\\b"
+      },
+      {
+        "rule": "A view never holds a repository or a coordinator",
+        "pattern": "\\b(let|var)\\s+\\w+\\s*:\\s*[\\w.]*(Repository|Coordinator)\\b",
+        "scope": "/Views/"
+      },
+      {
+        "rule": "A view never starts its own `Task {}`; the ViewModel does",
+        "pattern": "\\bTask\\s*\\{",
+        "scope": "/Views/"
+      },
+      {
+        "rule": "No `@Environment` for dependencies; inject through init",
+        "pattern": "@Environment\\(\\\\\\.\\w*(repository|service|coordinator)"
+      }
+    ]
+  }
+}

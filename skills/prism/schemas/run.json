@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "platform": "str",
+    "scenarios": "list+",
+    "evidence": "list"
+  },
+  "checks": [
+    "evidence"
+  ]
+}

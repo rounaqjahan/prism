@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "platform": "str",
+    "repo": "str",
+    "number": "int",
+    "url": "str",
+    "branch": "str",
+    "prs": "list"
+  }
+}

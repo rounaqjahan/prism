@@ -1,0 +1,12 @@
+{
+  "fields": {
+    "options": "list+",
+    "recommended": "str",
+    "sources": "list+",
+    "claims": "list"
+  },
+  "checks": [
+    "evidence",
+    "urls_fetched"
+  ]
+}

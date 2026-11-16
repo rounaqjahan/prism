@@ -1,0 +1,18 @@
+{
+  "fields": {
+    "change": "str",
+    "kind": "str",
+    "platforms": "list+",
+    "reference_platform": "str|null",
+    "scenarios": "list+",
+    "setup": "list"
+  },
+  "enums": {
+    "kind": [
+      "from .prism/prism.json kinds"
+    ]
+  },
+  "checks": [
+    "scenarios"
+  ]
+}

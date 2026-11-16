@@ -1,0 +1,14 @@
+{
+  "fields": {
+    "platform": "str",
+    "result": "str",
+    "checks": "list"
+  },
+  "enums": {
+    "result": [
+      "green",
+      "red",
+      "none"
+    ]
+  }
+}

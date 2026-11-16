@@ -1,0 +1,22 @@
+{
+  "fields": {
+    "platform": "str",
+    "change": "str",
+    "files": "list",
+    "engine_change": "bool",
+    "claims": "list",
+    "regressions": "list"
+  },
+  "enums": {
+    "change": [
+      "change",
+      "no_change"
+    ]
+  },
+  "checks": [
+    "files",
+    "evidence",
+    "reuses",
+    "regressions"
+  ]
+}

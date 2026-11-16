@@ -1,0 +1,6 @@
+{
+  "fields": {
+    "approved": "bool",
+    "said": "str"
+  }
+}

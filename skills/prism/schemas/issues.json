@@ -1,0 +1,8 @@
+{
+  "fields": {
+    "issues": "dict"
+  },
+  "checks": [
+    "issues"
+  ]
+}

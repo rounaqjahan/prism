@@ -1,0 +1,8 @@
+{
+  "fields": {
+    "rows": "list+"
+  },
+  "checks": [
+    "coldread"
+  ]
+}

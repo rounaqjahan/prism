@@ -1,0 +1,18 @@
+{
+  "fields": {
+    "screens": "list+",
+    "states": "dict",
+    "actions": "list",
+    "apis": "list",
+    "strings": "list",
+    "flags": "list",
+    "claims": "list",
+    "phases": "list+"
+  },
+  "checks": [
+    "evidence",
+    "apis",
+    "urls_fetched",
+    "phases"
+  ]
+}

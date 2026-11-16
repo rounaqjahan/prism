@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "platform": "str",
+    "result": "str",
+    "commands": "list+",
+    "log": "str"
+  },
+  "enums": {
+    "result": [
+      "pass",
+      "fail",
+      "blocked"
+    ]
+  }
+}

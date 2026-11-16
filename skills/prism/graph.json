@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "platforms": "from .prism/prism.json",
+  "max_retries": 3,
+  "flags": {
+    "no_reference": {
+      "set_by": "brief",
+      "required": true
+    },
+    "engine_changed": {
+      "set_by": "map",
+      "default": false
+    },
+    "sliced": {
+      "set_by": "spec",
+      "default": false
+    }
+  },
+  "nodes": [
+    {
+      "id": "brief",
+      "kind": "human",
+      "after": [],
+      "writes": [
+        "brief.json"
+      ],
+      "pause": "Read back the brief and the test scenarios in plain language. Nothing runs before the user says yes. Set no_reference=true when no platform has the feature."
+    },
+    {
+      "id": "research",
+      "kind": "agent",
+      "agent": "fg-researcher",
+      "skill": "gather-feature-specs",
+      "when": "no_reference",
+      "after": [
+        "brief"
+      ],
+      "reads": [
+        "brief.json"
+      ],
+      "writes": [
+        "research.json"
+      ]
+    },
+    {
+      "id": "plan",
+      "kind": "human",
+      "when": "no_reference",
+      "after": [
+        "research"
+      ],
+      "reads": [
+        "research.json"
+      ],
+      "writes": [
+        "plan.json"
+      ],
+      "pause": "Show the 2-3 options and the recommendation. The user picks or edits one."
+    },
+    {
+      "id": "spec",
+      "kind": "agent",
+      "agent": "fg-spec-writer",
+      "after": [
+        "brief",
+        "plan"
+      ],
+      "reads": [
+        "brief.json",
+        "plan.json?",
+        "research.json?"
+      ],
+      "writes": [
+        "spec.json"
+      ]
+    },
+    {
+      "id": "map",
+      "kind": "agent",
+      "agent": "fg-mapper",
+      "for_each": "platforms",
+      "after": [
+        "spec"
+      ],
+      "reads": [
+        "spec.json"
+      ],
+      "writes": [
+        "map-{p}.json"
+      ],
+      "skip_if": "sliced"
+    },
+    {
+      "id": "coldread",
+      "kind": "agent",
+      "agent": "fg-cold-reader",
+      "after": [
+        "map"
+      ],
+      "reads": [
+        "brief.json",
+        "map-*.json"
+      ],
+      "writes": [
+        "coldread.json"
+      ],
+      "skip_if": "sliced"
+    },
+    {
+      "id": "mapcheck",
+      "kind": "human",
+      "after": [
+        "coldread"
+      ],
+      "reads": [
+        "map-*.json"
+      ],
+      "writes": [
+        "mapcheck.json"
+      ],
+      "pause": "Show one table per platform from its map: file, add/change, layer, what. Skipped platforms say 'no change'. Nothing is built before the user says yes.",
+      "skip_if": "sliced"
+    },
+    {
+      "id": "issues",
+      "kind": "script",
+      "script": "lib/open-issues.py",
+      "join": true,
+      "after": [
+        "mapcheck"
+      ],
+      "reads": [
+        "spec.json",
+        "map-*.json"
+      ],
+      "writes": [
+        "issues.json"
+      ],
+      "skip_if": "sliced"
+    },
+    {
+      "id": "engine",
+      "kind": "agent",
+      "agent": "fg-builder",
+      "when": "engine_changed",
+      "after": [
+        "issues"
+      ],
+      "reads": [
+        "spec.json"
+      ],
+      "writes": [
+        "build-engine.json"
+      ],
+      "skip_if": "sliced"
+    },
+    {
+      "id": "build",
+      "kind": "agent",
+      "agent": "fg-builder",
+      "for_each": "platforms",
+      "after": [
+        "issues",
+        {
+          "node": "engine",
+          "only": "@shared"
+        }
+      ],
+      "reads": [
+        "spec.json",
+        "brief.json",
+        "map-{p}.json",
+        "build-engine.json?"
+      ],
+      "writes": [
+        "build-{p}.json"
+      ]
+    },
+    {
+      "id": "gate",
+      "kind": "script",
+      "script": "lib/local-gate.py {p}",
+      "for_each": "platforms",
+      "after": [
+        "build"
+      ],
+      "reads": [
+        "build-{p}.json"
+      ],
+      "writes": [
+        "gate-{p}.json"
+      ],
+      "on_fail": "build"
+    },
+    {
+      "id": "verify",
+      "kind": "agent",
+      "agent": "fg-verifier",
+      "for_each": "platforms",
+      "after": [
+        "gate"
+      ],
+      "reads": [
+        "spec.json",
+        "brief.json",
+        "map-{p}.json",
+        "build-{p}.json",
+        "gate-{p}.json"
+      ],
+      "writes": [
+        "verdict-{p}.json"
+      ],
+      "on_fail": "build"
+    },
+    {
+      "id": "run",
+      "kind": "agent",
+      "agent": "fg-runner",
+      "for_each": "platforms",
+      "after": [
+        "verify"
+      ],
+      "reads": [
+        "brief.json",
+        "spec.json",
+        "verdict-{p}.json"
+      ],
+      "writes": [
+        "run-{p}.json"
+      ],
+      "on_fail": "build",
+      "skip_continues": true
+    },
+    {
+      "id": "pr",
+      "kind": "script",
+      "script": "lib/open-pr.py {p}",
+      "for_each": "platforms",
+      "after": [
+        "run"
+      ],
+      "reads": [
+        "brief.json",
+        "run-choice.json",
+        "run-{p}.json?",
+        "verdict-{p}.json",
+        "issues.json"
+      ],
+      "writes": [
+        "pr-{p}.json"
+      ],
+      "on_fail": "build"
+    },
+    {
+      "id": "ci",
+      "kind": "script",
+      "script": "lib/check-ci.py {p}",
+      "for_each": "platforms",
+      "after": [
+        "pr"
+      ],
+      "reads": [
+        "pr-{p}.json"
+      ],
+      "writes": [
+        "ci-{p}.json"
+      ],
+      "on_fail": "build"
+    },
+    {
+      "id": "report",
+      "kind": "human",
+      "join": true,
+      "after": [
+        "ci"
+      ],
+      "writes": [],
+      "pause": "Per-platform report: scenarios pass/fail/unverified (or 'you run it'), the PR link and CI result per platform, the matrix link, and the evidence folder when Claude ran the app.",
+      "skip_if": "sliced"
+    }
+  ]
+}

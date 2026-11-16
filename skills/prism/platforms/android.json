@@ -1,0 +1,114 @@
+{
+  "name": "Android",
+  "exts": [
+    ".kt",
+    ".java"
+  ],
+  "detect": {
+    "any": [
+      "build.gradle",
+      "build.gradle.kts",
+      "settings.gradle",
+      "settings.gradle.kts"
+    ],
+    "not": [
+      "pubspec.yaml"
+    ]
+  },
+  "gate": {
+    "app": [
+      {
+        "cmd": [
+          "{gradlew}",
+          "testDebugUnitTest",
+          "--console=plain"
+        ]
+      },
+      {
+        "cmd": [
+          "{gradlew}",
+          "assembleDebug",
+          "--console=plain"
+        ],
+        "build": true
+      }
+    ],
+    "sdk": [
+      {
+        "cmd": [
+          "{gradlew}",
+          "testDebugUnitTest",
+          "--console=plain"
+        ]
+      },
+      {
+        "cmd": [
+          "{gradlew}",
+          "assembleDebug",
+          "--console=plain"
+        ],
+        "build": true
+      }
+    ]
+  },
+  "run_needs": [
+    "mobile-mcp",
+    "adb",
+    "android-emulator"
+  ],
+  "standing_rules": [
+    {
+      "rule": "No debug prints left in code",
+      "pattern": "\\b(println|System\\.out\\.print\\w*)\\(",
+      "said": "no slop, no unnecessary code"
+    },
+    {
+      "rule": "No TODO/FIXME left in code",
+      "pattern": "\\b(TODO|FIXME)\\b",
+      "said": "no slop, no unnecessary code"
+    },
+    {
+      "rule": "Kotlin types are UpperCamelCase",
+      "pattern": "\\b(class|interface|object)\\s+[a-z_]\\w*\\s*[:({<]",
+      "ext": [
+        ".kt"
+      ],
+      "said": "follow each platform's naming convention"
+    },
+    {
+      "rule": "New Kotlin files are UpperCamelCase.kt",
+      "name_pattern": "^[A-Z][A-Za-z0-9]*\\.kt$",
+      "ext": [
+        ".kt"
+      ],
+      "said": "follow each platform's naming convention"
+    }
+  ],
+  "create_note": "Make the empty app in Android Studio (New Project > Empty Activity, Kotlin, Compose) with this repo folder as its location. No commit needed; Prism commits the shell.",
+  "mvvm_c": {
+    "description": "MVVM-C: Compose screens stay dumb and only render ViewModel state (StateFlow) and send events; ViewModels hold the logic and call repositories; repositories own networking and storage; a Coordinator/NavHost owns navigation; dependencies are injected (constructor injection).",
+    "folders": {
+      "screens": "presentation/<feature>/",
+      "logic": "presentation/<feature>/<Feature>ViewModel.kt",
+      "data": "data/repository/",
+      "navigation": "navigation/<Feature>Coordinator.kt"
+    },
+    "max_file_lines": 300,
+    "rules": [
+      {
+        "rule": "No new `object` singletons",
+        "pattern": "^\\s*(internal\\s+|private\\s+)?object\\s+\\w+\\s*(\\{|:)"
+      },
+      {
+        "rule": "A composable never builds a repository, service or HTTP client",
+        "pattern": "\\b[A-Z]\\w*(Repository|Service)\\(|\\bOkHttpClient\\(",
+        "scope": "/presentation/"
+      },
+      {
+        "rule": "A ViewModel never holds a Context or a View",
+        "pattern": "\\b(context|view)\\s*:\\s*(Context|View)\\b",
+        "scope": "ViewModel"
+      }
+    ]
+  }
+}

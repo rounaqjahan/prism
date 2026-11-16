@@ -4,7 +4,7 @@ Prism takes one app feature to both of your platforms, **iOS and Android**, in p
 
 It works with any project: an existing one (Prism reads it), one whose repos are spread over several places (Prism asks where), or a brand-new one (Prism asks how you want it built and sets it up).
 
-Prism is free. **[Prism Pro](#prism-pro)** adds Web, Flutter and React Native, Windows and Linux, and PR review handling.
+Prism is free. **[Prism Pro](https://www.agensi.io/skills/prism-pro)** adds Web, Flutter and React Native, Windows and Linux, and PR review handling.
 
 ## Prism or Prism Pro?
 
